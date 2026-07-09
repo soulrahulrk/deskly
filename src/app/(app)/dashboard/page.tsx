@@ -1,49 +1,53 @@
 import type { Metadata } from "next";
 import { getTenant } from "@/lib/dal/context";
-import { prisma } from "@/lib/db";
+import {
+  getDashboardKPIs,
+  getTicketVolumeSeries,
+  getTicketsByStatus,
+  getTicketsByPriority,
+  getAgentLeaderboard,
+} from "@/lib/dal/analytics";
+import { KPICards } from "@/components/dashboard/kpi-cards";
+import { VolumeChart } from "@/components/dashboard/volume-chart";
+import { StatusDistribution } from "@/components/dashboard/status-distribution";
+import { PriorityChart } from "@/components/dashboard/priority-chart";
+import { AgentLeaderboard } from "@/components/dashboard/agent-leaderboard";
 
 export const metadata: Metadata = { title: "Dashboard" };
 
-/**
- * Dashboard landing page. M3 shows quick summary stats; the full KPI cards
- * and charts are built in M4.
- */
 export default async function DashboardPage() {
   const { orgId } = await getTenant();
 
-  const [openCount, resolvedCount, contactCount] = await Promise.all([
-    prisma.ticket.count({
-      where: { orgId, deletedAt: null, status: { in: ["OPEN", "IN_PROGRESS", "WAITING"] } },
-    }),
-    prisma.ticket.count({
-      where: { orgId, deletedAt: null, status: { in: ["RESOLVED", "CLOSED"] } },
-    }),
-    prisma.contact.count({ where: { orgId } }),
-  ]);
+  // Fetch all analytics data in parallel
+  const [kpis, volumeSeries, statusData, priorityData, leaderboardData] =
+    await Promise.all([
+      getDashboardKPIs(orgId),
+      getTicketVolumeSeries(orgId),
+      getTicketsByStatus(orgId),
+      getTicketsByPriority(orgId),
+      getAgentLeaderboard(orgId),
+    ]);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
         <p className="text-sm text-muted-foreground">
-          Overview of your support workspace.
+          Overview of your support workspace over the last 30 days.
         </p>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <SummaryCard label="Open tickets" value={openCount} />
-        <SummaryCard label="Resolved" value={resolvedCount} />
-        <SummaryCard label="Contacts" value={contactCount} />
-      </div>
-    </div>
-  );
-}
+      <KPICards data={kpis} />
 
-function SummaryCard({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-xl border bg-card p-5">
-      <p className="text-sm font-medium text-muted-foreground">{label}</p>
-      <p className="mt-1 text-3xl font-bold tabular-nums">{value}</p>
+      <div className="grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
+        {/* Top row: Volume chart takes half on big screens, status donut takes a quarter */}
+        <VolumeChart data={volumeSeries} />
+        <StatusDistribution data={statusData} />
+        <PriorityChart data={priorityData} />
+
+        {/* Next row: Leaderboard */}
+        <AgentLeaderboard data={leaderboardData} />
+      </div>
     </div>
   );
 }
