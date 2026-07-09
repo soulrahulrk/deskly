@@ -65,10 +65,22 @@
 
 ## 4. Current status
 
-- **Active milestone:** M0 → M1
-- **Last action:** wrote foundation docs (this file, MASTER_REQUIREMENTS, plan, research).
-- **Next action:** scaffold Next.js app (`create-next-app` non-interactive), wire Tailwind + shadcn, Prisma init, Auth.js skeleton, base app shell + theme provider; verify `npm run build`.
-- **Blocps / open questions:** real Digital Heroes brief not yet provided — building to the STEP 1–15 spec; will reconcile on receipt.
+- **Active milestone:** M3 → M4
+- **Last action:** completed M3; CRUD and Auth flows verified.
+- [x] M0: Project initialization (Next.js, Tailwind v4, linting)
+- [x] M1: Core architecture (Prisma adapter, directory structure)
+- [x] M2: Auth & Tenancy (Auth.js, org-scoped DAL, Seed script)
+- [x] M3: App shell & core CRUD (Tickets, Contacts, Auth pages)
+- [ ] M4: Dashboard & Analytics
+- [ ] M5: Rich Data Tables
+- [ ] M6: UX Polish (Command palette, optimistic UI)
+- [ ] M7: Settings & RBAC (Team management, audit log viewer)
+- [ ] M8: Testing & CI
+- [ ] M9: Docs & Deploy (Landing page, Turso, Vercel)
+
+## Current Status (Last Updated: M3)
+
+We have completed **Milestone 3**. The authenticated app shell is in place with a responsive sidebar and topbar. The full authentication flow (login, register, forgot password, reset password, verify email) is functional using server actions and Zod validation. Core CRUD operations for Tickets and Contacts have been implemented with role-based access control (`can()`) and strict tenant isolation via the DAL. All mutations write to the immutable AuditLog. The test suite (`typecheck`, `lint`, `build`) passes.
 
 ---
 
