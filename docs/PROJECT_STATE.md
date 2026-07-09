@@ -50,9 +50,9 @@
 | M | Name | Status | Exit criteria |
 |---|------|--------|---------------|
 | M0 | Foundation & planning docs | ✅ DONE | This file + MASTER_REQUIREMENTS + plan + research written |
-| M1 | Scaffold (Next/TS/Tailwind/shadcn/Prisma/Auth) | ⏳ NEXT | `npm run build` passes; base layout + theme render |
-| M2 | Data model & auth (schema, seed, RBAC) | ⬜ | Login works; seeded data; middleware protects routes |
-| M3 | Core CRUD (tickets, comments, contacts) | ⬜ | Create/read/update/delete ticket end-to-end |
+| M1 | Scaffold (Next/TS/Tailwind/shadcn/Prisma/Auth) | ✅ DONE | build green; tokens+providers+headers; pushed to GitHub |
+| M2 | Data model & auth (schema, seed, RBAC) | ✅ DONE | schema+migration+seed verified; Auth.js+RBAC+proxy build green |
+| M3 | Core CRUD (tickets, comments, contacts) | ⏳ NEXT | app shell + auth pages + create/read/update/delete ticket end-to-end |
 | M4 | Dashboard & analytics | ⬜ | KPIs + ≥3 charts render from real data |
 | M5 | Data table (search/filter/sort/paginate/export) | ⬜ | URL-driven table; CSV + PDF download work |
 | M6 | UX polish (⌘K, dark mode, states, a11y) | ⬜ | Command palette + all 5 UI states + keyboard nav |
