@@ -2,16 +2,16 @@ import { prisma } from "@/lib/db";
 import { subDays, startOfDay, format } from "date-fns";
 
 /**
- * M4: Dashboard & Analytics DAL
- * Aggregates ticket data for the dashboard charts and KPI cards.
- * Uses a default 30-day window for trends.
+ * Aggregates ticket data for the dashboard and analytics charts. Every
+ * function takes an optional `windowDays` so the same queries power both the
+ * fixed 30-day Dashboard glance and the Analytics page's adjustable range.
  */
 
 const WINDOW_DAYS = 30;
 
-export async function getDashboardKPIs(orgId: string) {
+export async function getDashboardKPIs(orgId: string, windowDays: number = WINDOW_DAYS) {
   const now = new Date();
-  const windowStart = subDays(startOfDay(now), WINDOW_DAYS);
+  const windowStart = subDays(startOfDay(now), windowDays);
 
   // 1. Total currently open (not restricted by date)
   const openCount = await prisma.ticket.count({
@@ -65,9 +65,9 @@ export async function getDashboardKPIs(orgId: string) {
   };
 }
 
-export async function getTicketVolumeSeries(orgId: string) {
+export async function getTicketVolumeSeries(orgId: string, windowDays: number = WINDOW_DAYS) {
   const now = new Date();
-  const windowStart = subDays(startOfDay(now), WINDOW_DAYS - 1); // 30 days including today
+  const windowStart = subDays(startOfDay(now), windowDays - 1); // include today
 
   // Fetch all tickets created OR resolved in the window
   const tickets = await prisma.ticket.findMany({
@@ -84,8 +84,8 @@ export async function getTicketVolumeSeries(orgId: string) {
 
   // Initialize a bucket for each day
   const series: Record<string, { date: string; created: number; resolved: number }> = {};
-  for (let i = 0; i < WINDOW_DAYS; i++) {
-    const day = subDays(startOfDay(now), WINDOW_DAYS - 1 - i);
+  for (let i = 0; i < windowDays; i++) {
+    const day = subDays(startOfDay(now), windowDays - 1 - i);
     const dayStr = format(day, "MMM dd");
     series[dayStr] = { date: dayStr, created: 0, resolved: 0 };
   }
@@ -135,9 +135,13 @@ export async function getTicketsByPriority(orgId: string) {
   }));
 }
 
-export async function getAgentLeaderboard(orgId: string) {
+export async function getAgentLeaderboard(
+  orgId: string,
+  windowDays: number = WINDOW_DAYS,
+  limit: number = 5,
+) {
   const now = new Date();
-  const windowStart = subDays(startOfDay(now), WINDOW_DAYS);
+  const windowStart = subDays(startOfDay(now), windowDays);
 
   const groups = await prisma.ticket.groupBy({
     by: ["assigneeId"],
@@ -150,7 +154,7 @@ export async function getAgentLeaderboard(orgId: string) {
     },
     _count: { id: true },
     orderBy: { _count: { id: "desc" } },
-    take: 5,
+    take: limit,
   });
 
   if (groups.length === 0) return [];

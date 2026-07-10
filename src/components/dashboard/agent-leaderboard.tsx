@@ -3,13 +3,14 @@ import { User, Trophy } from "lucide-react";
 
 interface AgentLeaderboardProps {
   data: Array<{ name: string; resolved: number }>;
+  periodLabel?: string;
 }
 
-export function AgentLeaderboard({ data }: AgentLeaderboardProps) {
+export function AgentLeaderboard({ data, periodLabel = "30d" }: AgentLeaderboardProps) {
   return (
     <Card className="col-span-1 lg:col-span-2">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-base">Agent Leaderboard (30d)</CardTitle>
+        <CardTitle className="text-base">Agent Leaderboard ({periodLabel})</CardTitle>
         <Trophy className="size-4 text-muted-foreground" />
       </CardHeader>
       <CardContent>

@@ -7,9 +7,10 @@ interface KPICardsProps {
     resolutionRate: number;
     avgFirstResponseHours: number;
   };
+  periodLabel?: string;
 }
 
-export function KPICards({ data }: KPICardsProps) {
+export function KPICards({ data, periodLabel = "30d" }: KPICardsProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <div className="rounded-xl border bg-card p-5">
@@ -25,7 +26,7 @@ export function KPICards({ data }: KPICardsProps) {
       <div className="rounded-xl border bg-card p-5">
         <div className="flex items-center gap-2">
           <CheckCircle2 className="size-4 text-muted-foreground" />
-          <p className="text-sm font-medium text-muted-foreground">Resolved (30d)</p>
+          <p className="text-sm font-medium text-muted-foreground">Resolved ({periodLabel})</p>
         </div>
         <div className="mt-2 flex items-baseline gap-2">
           <p className="text-3xl font-bold tabular-nums">{data.resolvedCount}</p>

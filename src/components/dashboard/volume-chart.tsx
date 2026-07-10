@@ -14,13 +14,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface VolumeChartProps {
   data: Array<{ date: string; created: number; resolved: number }>;
+  periodLabel?: string;
 }
 
-export function VolumeChart({ data }: VolumeChartProps) {
+export function VolumeChart({ data, periodLabel = "30d" }: VolumeChartProps) {
   return (
     <Card className="col-span-full xl:col-span-2">
       <CardHeader>
-        <CardTitle className="text-base">Ticket Volume (30d)</CardTitle>
+        <CardTitle className="text-base">Ticket Volume ({periodLabel})</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[300px] w-full">
