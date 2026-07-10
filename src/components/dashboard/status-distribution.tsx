@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import {
@@ -9,6 +8,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import type { ValueType, NameType } from "recharts/types/component/DefaultTooltipContent";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { STATUS_META } from "@/lib/constants/display";
 
@@ -20,13 +20,15 @@ export function StatusDistribution({ data }: StatusDistributionProps) {
   // Sort data so OPEN/IN_PROGRESS are first, matching typical mental models
   const sortedData = [...data].sort((a, b) => b.value - a.value);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const tooltipFormatter = (value: any, name: any) => [
+  const tooltipFormatter = (
+    value: ValueType | undefined,
+    name: NameType | undefined,
+  ): [ValueType | undefined, string] => [
     value,
     STATUS_META[name as keyof typeof STATUS_META]?.label ?? String(name),
   ];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const legendFormatter = (value: any) => STATUS_META[value as keyof typeof STATUS_META]?.label ?? String(value);
+  const legendFormatter = (value: string): string =>
+    STATUS_META[value as keyof typeof STATUS_META]?.label ?? value;
 
   return (
     <Card className="col-span-1">
@@ -68,11 +70,11 @@ export function StatusDistribution({ data }: StatusDistributionProps) {
                   boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                 }}
                 itemStyle={{ color: "var(--color-foreground)" }}
-                formatter={tooltipFormatter as any}
+                formatter={tooltipFormatter}
               />
               <Legend
                 wrapperStyle={{ fontSize: "12px", paddingTop: "20px" }}
-                formatter={legendFormatter as any}
+                formatter={legendFormatter}
               />
             </PieChart>
           </ResponsiveContainer>

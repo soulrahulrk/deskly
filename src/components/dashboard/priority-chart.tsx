@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
+import type { ReactNode } from "react";
 import {
   BarChart,
   Bar,
@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import type { ValueType } from "recharts/types/component/DefaultTooltipContent";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PRIORITY_META } from "@/lib/constants/display";
 
@@ -23,10 +24,12 @@ export function PriorityChart({ data }: PriorityChartProps) {
   const rank = { LOW: 1, MEDIUM: 2, HIGH: 3, URGENT: 4 } as Record<string, number>;
   const sortedData = [...data].sort((a, b) => (rank[a.name] ?? 0) - (rank[b.name] ?? 0));
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const tooltipFormatter = (value: any) => [value, "Tickets"];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const tooltipLabelFormatter = (label: any) => PRIORITY_META[label as keyof typeof PRIORITY_META]?.label ?? String(label);
+  const tooltipFormatter = (value: ValueType | undefined): [ValueType | undefined, string] => [
+    value,
+    "Tickets",
+  ];
+  const tooltipLabelFormatter = (label: ReactNode): ReactNode =>
+    PRIORITY_META[label as keyof typeof PRIORITY_META]?.label ?? label;
 
   return (
     <Card className="col-span-1">
@@ -47,8 +50,9 @@ export function PriorityChart({ data }: PriorityChartProps) {
                 tickLine={false} 
                 tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }} 
                 dy={10}
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                tickFormatter={(val: any) => PRIORITY_META[val as keyof typeof PRIORITY_META]?.label ?? val}
+                tickFormatter={(val: string): string =>
+                  PRIORITY_META[val as keyof typeof PRIORITY_META]?.label ?? val
+                }
               />
               <YAxis 
                 axisLine={false} 
@@ -65,8 +69,8 @@ export function PriorityChart({ data }: PriorityChartProps) {
                   boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                 }}
                 itemStyle={{ color: "var(--color-foreground)" }}
-                formatter={tooltipFormatter as any}
-                labelFormatter={tooltipLabelFormatter as any}
+                formatter={tooltipFormatter}
+                labelFormatter={tooltipLabelFormatter}
               />
               <Bar dataKey="value" radius={[4, 4, 0, 0]} maxBarSize={50}>
                 {sortedData.map((entry, index) => {
