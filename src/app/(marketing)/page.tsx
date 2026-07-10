@@ -14,12 +14,28 @@ import {
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth/session";
 import { Button } from "@/components/ui/button";
+import { JsonLd } from "@/components/json-ld";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Deskly — The support desk your team will actually enjoy",
   description: siteConfig.description,
   alternates: { canonical: "/" },
+};
+
+const SOFTWARE_APPLICATION_JSON_LD = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: siteConfig.name,
+  description: siteConfig.description,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  url: siteConfig.url,
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
 };
 
 const FEATURES = [
@@ -73,6 +89,8 @@ export default async function LandingPage() {
 
   return (
     <>
+      <JsonLd data={SOFTWARE_APPLICATION_JSON_LD} />
+
       {/* Hero */}
       <section className="mx-auto max-w-6xl px-4 pb-16 pt-16 text-center sm:px-6 sm:pt-24">
         <span className="inline-flex items-center rounded-full border bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">

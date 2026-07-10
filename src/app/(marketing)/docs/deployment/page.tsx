@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { siteConfig } from "@/lib/site";
+import { JsonLd } from "@/components/json-ld";
+import { docsBreadcrumbJsonLd } from "../breadcrumb-json-ld";
 
 export const metadata: Metadata = {
   title: "Deployment",
@@ -12,6 +14,7 @@ export const metadata: Metadata = {
 export default function DeploymentPage() {
   return (
     <article className="mx-auto max-w-[680px] px-4 py-16 sm:px-6">
+      <JsonLd data={docsBreadcrumbJsonLd("Deployment", "/docs/deployment")} />
       <nav aria-label="Breadcrumb" className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground">
         <Link href="/docs" className="hover:text-foreground">
           Docs
