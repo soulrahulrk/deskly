@@ -12,7 +12,10 @@ export function SettingsNav({
   const pathname = usePathname();
 
   return (
-    <nav className="flex shrink-0 gap-1 overflow-x-auto md:w-48 md:flex-col md:overflow-visible">
+    <nav
+      aria-label="Settings"
+      className="flex shrink-0 gap-1 overflow-x-auto md:w-48 md:flex-col md:overflow-visible"
+    >
       {items.map(({ href, label }) => {
         const isActive = pathname === href || pathname.startsWith(`${href}/`);
         return (

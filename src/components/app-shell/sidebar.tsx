@@ -28,7 +28,7 @@ function NavLinks({ onClick }: { onClick?: () => void }) {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-col gap-1 px-3">
+    <nav aria-label="Main" className="flex flex-col gap-1 px-3">
       {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
         const isActive =
           pathname === href || pathname.startsWith(`${href}/`);
