@@ -3,6 +3,7 @@ import { getTenant } from "@/lib/dal/context";
 import { getTicketWithDetails } from "@/lib/dal/tickets";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { format } from "date-fns";
+import { rateLimit, clientIp } from "@/lib/rate-limit";
 
 export async function GET(
   req: NextRequest,
@@ -10,8 +11,16 @@ export async function GET(
 ) {
   try {
     const { id } = await props.params;
-    const { orgId } = await getTenant();
-    
+    const { user, orgId } = await getTenant();
+
+    const limit = rateLimit(`export-pdf:${clientIp(req.headers)}:${user.id}`, 20, 5 * 60 * 1000);
+    if (!limit.ok) {
+      return new Response("Too many export requests. Try again shortly.", {
+        status: 429,
+        headers: { "Retry-After": String(limit.retryAfter) },
+      });
+    }
+
     const ticket = await getTicketWithDetails(orgId, id);
     if (!ticket) {
       return new Response("Ticket not found", { status: 404 });
