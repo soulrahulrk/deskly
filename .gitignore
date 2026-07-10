@@ -46,6 +46,10 @@ yarn-error.log*
 /test-results
 /blob-report
 /playwright/.cache
+/coverage
+/test/*.db
+/test/*.db-*
+/test/test.db
 
 # vercel
 .vercel
