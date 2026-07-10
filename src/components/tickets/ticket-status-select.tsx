@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useOptimistic, useTransition } from "react";
 import {
   Select,
   SelectContent,
@@ -18,27 +18,35 @@ interface TicketStatusSelectProps {
   currentStatus: TicketStatus;
 }
 
+/**
+ * Optimistic: the select shows the new status immediately on change, before
+ * the server confirms it. `useOptimistic` automatically reverts to
+ * `currentStatus` once the transition settles — on success that's already
+ * the new value (revalidatePath refreshed the prop); on failure it's still
+ * the old one, so the UI snaps back and the toast explains why.
+ */
 export function TicketStatusSelect({
   ticketId,
   currentStatus,
 }: TicketStatusSelectProps) {
   const [isPending, startTransition] = useTransition();
+  const [optimisticStatus, setOptimisticStatus] = useOptimistic(currentStatus);
 
   function onChange(value: string) {
+    const status = value as TicketStatus;
     startTransition(async () => {
-      const result = await updateTicketAction(ticketId, {
-        status: value as TicketStatus,
-      });
+      setOptimisticStatus(status);
+      const result = await updateTicketAction(ticketId, { status });
       if (!result.ok) {
         toast.error(result.error);
         return;
       }
-      toast.success(`Status changed to ${STATUS_META[value as TicketStatus].label}`);
+      toast.success(`Status changed to ${STATUS_META[status].label}`);
     });
   }
 
   return (
-    <Select defaultValue={currentStatus} onValueChange={onChange} disabled={isPending}>
+    <Select value={optimisticStatus} onValueChange={onChange} disabled={isPending}>
       <SelectTrigger className="w-[150px]">
         <SelectValue />
       </SelectTrigger>

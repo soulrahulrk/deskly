@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useOptimistic, useTransition } from "react";
 import {
   Select,
   SelectContent,
@@ -25,16 +25,21 @@ interface TicketAssigneeSelectProps {
   members: MemberOption[];
 }
 
+const UNASSIGNED = "__unassigned__";
+
+/** Optimistic — see TicketStatusSelect for why. */
 export function TicketAssigneeSelect({
   ticketId,
   currentAssigneeId,
   members,
 }: TicketAssigneeSelectProps) {
   const [isPending, startTransition] = useTransition();
+  const [optimisticAssigneeId, setOptimisticAssigneeId] = useOptimistic(currentAssigneeId);
 
   function onChange(value: string) {
-    const assigneeId = value === "__unassigned__" ? null : value;
+    const assigneeId = value === UNASSIGNED ? null : value;
     startTransition(async () => {
+      setOptimisticAssigneeId(assigneeId);
       const result = await updateTicketAction(ticketId, { assigneeId });
       if (!result.ok) {
         toast.error(result.error);
@@ -47,7 +52,7 @@ export function TicketAssigneeSelect({
 
   return (
     <Select
-      defaultValue={currentAssigneeId ?? "__unassigned__"}
+      value={optimisticAssigneeId ?? UNASSIGNED}
       onValueChange={onChange}
       disabled={isPending}
     >
@@ -55,7 +60,7 @@ export function TicketAssigneeSelect({
         <SelectValue placeholder="Unassigned" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="__unassigned__">Unassigned</SelectItem>
+        <SelectItem value={UNASSIGNED}>Unassigned</SelectItem>
         {members.map((m) => (
           <SelectItem key={m.id} value={m.id}>
             <span className="flex items-center gap-2">

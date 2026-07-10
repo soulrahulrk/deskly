@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useOptimistic, useTransition } from "react";
 import {
   Select,
   SelectContent,
@@ -18,27 +18,29 @@ interface TicketPrioritySelectProps {
   currentPriority: TicketPriority;
 }
 
+/** Optimistic — see TicketStatusSelect for why. */
 export function TicketPrioritySelect({
   ticketId,
   currentPriority,
 }: TicketPrioritySelectProps) {
   const [isPending, startTransition] = useTransition();
+  const [optimisticPriority, setOptimisticPriority] = useOptimistic(currentPriority);
 
   function onChange(value: string) {
+    const priority = value as TicketPriority;
     startTransition(async () => {
-      const result = await updateTicketAction(ticketId, {
-        priority: value as TicketPriority,
-      });
+      setOptimisticPriority(priority);
+      const result = await updateTicketAction(ticketId, { priority });
       if (!result.ok) {
         toast.error(result.error);
         return;
       }
-      toast.success(`Priority changed to ${PRIORITY_META[value as TicketPriority].label}`);
+      toast.success(`Priority changed to ${PRIORITY_META[priority].label}`);
     });
   }
 
   return (
-    <Select defaultValue={currentPriority} onValueChange={onChange} disabled={isPending}>
+    <Select value={optimisticPriority} onValueChange={onChange} disabled={isPending}>
       <SelectTrigger className="w-[130px]">
         <SelectValue />
       </SelectTrigger>
