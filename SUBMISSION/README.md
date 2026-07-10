@@ -11,6 +11,16 @@ reviewing this project; everything else in the repo is linked from here.
 | **GitHub repository** | https://github.com/soulrahulrk/deskly |
 | **Demo video** | _add your Loom link here after recording — script at [docs/demo-script.md](../docs/demo-script.md)_ |
 
+## Before you submit — repository polish
+
+Two things worth doing on GitHub itself (can't be scripted from inside the repo):
+
+1. **Description + topics.** On the repo page → the gear icon next to "About" → set the
+   description to the one-line pitch above, and add topics: `nextjs`, `typescript`, `prisma`,
+   `helpdesk`, `saas`, `react`, `tailwindcss`, `vercel`.
+2. **Pin it.** On your GitHub profile → Customize your pins → add this repo, so it's the first
+   thing a reviewer sees.
+
 ## Demo credentials
 
 No sign-up needed — the seeded accounts below all use the password `demo1234`:

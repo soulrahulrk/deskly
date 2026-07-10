@@ -96,6 +96,16 @@ The integration suite spins up a disposable SQLite database with the real migrat
 | --- | --- |
 | ![Command palette](docs/screenshots/command-palette.png) | ![Dark mode](docs/screenshots/dashboard-dark.png) |
 
+## Performance & SEO
+
+Measured with Lighthouse against a production build (`npm run build && npm run start`), not the
+dev server:
+
+| Page | Performance | Accessibility | Best Practices | SEO |
+| --- | --- | --- | --- | --- |
+| `/` (landing) | 91 | 100 | 100 | 100 |
+| `/docs` | 94 | 100 | 100 | 100 |
+
 ## Deployment
 
 Deploys to Vercel in a few minutes, with a Turso database for persistence. Full guide: [docs/deployment.md](docs/deployment.md) (also available in-app at `/docs/deployment`).
