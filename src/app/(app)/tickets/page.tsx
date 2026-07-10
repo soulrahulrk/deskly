@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTenant } from "@/lib/dal/context";
 import { getTickets } from "@/lib/dal/tickets";
+import { getMembers } from "@/lib/dal/members";
 import { can } from "@/lib/auth/permissions";
 import type { Role, TicketStatus, TicketPriority } from "@/lib/constants/enums";
 import { STATUS_META, PRIORITY_META } from "@/lib/constants/display";
@@ -84,16 +85,19 @@ export default async function TicketsPage(props: { searchParams: Promise<SearchP
   const page = typeof searchParams.page === "string" ? parseInt(searchParams.page, 10) : 1;
   const pageSize = 25;
 
-  const { tickets, totalCount } = await getTickets(orgId, {
-    query,
-    status,
-    priority,
-    assigneeId,
-    sort,
-    page: isNaN(page) ? 1 : page,
-    pageSize,
-  });
-  
+  const [{ tickets, totalCount }, members] = await Promise.all([
+    getTickets(orgId, {
+      query,
+      status,
+      priority,
+      assigneeId,
+      sort,
+      page: isNaN(page) ? 1 : page,
+      pageSize,
+    }),
+    getMembers(orgId),
+  ]);
+
   const canCreate = can({ role: user.role as Role }, "ticket:create");
 
   return (
@@ -118,7 +122,7 @@ export default async function TicketsPage(props: { searchParams: Promise<SearchP
         </div>
       </div>
 
-      <DataTableToolbar />
+      <DataTableToolbar members={members} />
 
       {tickets.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center">

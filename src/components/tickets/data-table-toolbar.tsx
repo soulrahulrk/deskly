@@ -7,8 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Search, X } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
 import { STATUS_META, PRIORITY_META } from "@/lib/constants/display";
+import type { MemberSummary } from "@/lib/dal/members";
 
-export function DataTableToolbar() {
+interface DataTableToolbarProps {
+  members: MemberSummary[];
+}
+
+export function DataTableToolbar({ members }: DataTableToolbarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -88,6 +93,21 @@ export function DataTableToolbar() {
           {Object.entries(PRIORITY_META).map(([key, meta]) => (
             <option key={key} value={key}>
               {meta.label}
+            </option>
+          ))}
+        </select>
+
+        {/* Assignee Filter */}
+        <select
+          className="hidden h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 lg:inline-flex"
+          value={searchParams.get("assignee") ?? ""}
+          onChange={(e) => router.push(`?${createQueryString("assignee", e.target.value)}`)}
+        >
+          <option value="">All Assignees</option>
+          <option value="unassigned">Unassigned</option>
+          {members.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.name ?? m.email}
             </option>
           ))}
         </select>
