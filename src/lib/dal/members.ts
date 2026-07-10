@@ -20,3 +20,8 @@ export async function getMembers(orgId: string): Promise<MemberSummary[]> {
     orderBy: { name: "asc" },
   });
 }
+
+/** Count of OWNER-role members in the org — guards the "last owner" rule. */
+export async function countOwners(orgId: string): Promise<number> {
+  return prisma.user.count({ where: { orgId, role: "OWNER" } });
+}
