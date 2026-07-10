@@ -58,17 +58,19 @@
 | M6 | UX polish (⌘K, dark mode, states, a11y) | ✅ DONE | Command palette + all 5 UI states + keyboard nav |
 | M7 | Settings, profile, members/RBAC, audit log | ✅ DONE | Role changes gated; audit log records mutations; verified end-to-end |
 | M8 | Testing (Vitest + Playwright) | ✅ DONE | 69 unit/integration + 12 E2E tests, all green |
-| M9 | Docs & deploy (README/SEO/CI/SUBMISSION) | 🔜 NEXT | All docs + SEO assets + CI + SUBMISSION/ present |
-| M10 | Final QA + self-review ≥95/100 | ⬜ | Line-by-line audit complete; score ≥95 |
+| M9 | Docs & deploy (README/SEO/CI/SUBMISSION) | ✅ DONE | All docs + SEO assets + CI + SUBMISSION/ present; v1.0.0 tagged |
+| M10 | Final QA + self-review ≥95/100 | 🔜 NEXT | Line-by-line audit complete; score ≥95 |
 
 ---
 
 ## 4. Current status
 
-- **Active milestone:** M6 done, audited, and hardened → M7 next
-- **Last action:** Claude Code audited Antigravity's M3–M6 work by actually running the app
-  end-to-end (Playwright against a live dev server), found and fixed two real crash bugs plus a
-  dropped-devDependencies regression from M1; see §8 for full detail.
+- **Active milestone:** M9 done → M10 (final QA + self-review) next
+- **Last action:** full M9 build-out — landing page, docs hub, FAQ, real Playwright-captured
+  screenshots, complete SEO (robots/sitemap/OG/JSON-LD/manifest/favicons), README rewrite,
+  docs/{architecture,API,deployment,testing,decisions,case-study,demo-script}.md, CHANGELOG,
+  CONTRIBUTING, GitHub Actions CI + issue/PR templates, and the SUBMISSION/ package. v1.0.0 tagged.
+  See §11 for full detail.
 - [x] M0: Project initialization (Next.js, Tailwind v4, linting)
 - [x] M1: Core architecture (Prisma adapter, directory structure)
 - [x] M2: Auth & Tenancy (Auth.js, org-scoped DAL, Seed script)
@@ -76,19 +78,19 @@
 - [x] M4: Dashboard & Analytics
 - [x] M5: Rich Data Tables (search/filter/sort/paginate/export — all verified server-side & URL-driven)
 - [x] M6: UX Polish (Command palette, dark mode, mobile responsive — all verified working post-fix)
-- [ ] M7: Settings & RBAC (Team management, audit log viewer)
-- [ ] M8: Testing & CI
-- [ ] M9: Docs & Deploy (Landing page, Turso, Vercel)
+- [x] M7: Settings & RBAC (Team management, audit log viewer)
+- [x] M8: Testing & CI (69 unit/integration + 12 E2E)
+- [x] M9: Docs & Deploy (Landing page, SEO, README, docs/*, CI, SUBMISSION/, v1.0.0 tag)
+- [ ] M10: Final line-by-line QA against MASTER_REQUIREMENTS.md + self-review ≥95/100
 
-## Current status (Last Updated: post-M6 audit)
+## Current status (Last updated: post-M9)
 
-M3–M6 are complete **and independently verified by actually running the application**, not just by
-reading the code or trusting green builds. Two real crash bugs were found and fixed (see §8): a
-Server/Client Component boundary violation that broke every authenticated page load, and a missing
-`<Command>` root that crashed the command palette on the first keystroke. Both are now confirmed
-fixed via a fresh Playwright run with zero console/page errors. `typecheck`, `lint`, and `build` are
-green. The dev/test tooling gap from M1 (vitest/playwright/testing-library/prettier/tsx silently
-missing from `package.json`) has been repaired so M8 can proceed without re-discovering it.
+M0–M9 are complete. Every milestone from M3 onward was verified by actually running the
+application (Playwright against a live dev server), not just by a green build — that discipline
+caught every real bug in this project, none of which a type-checker or linter would have found
+(see §8 and §11 for specifics). `typecheck`, `lint`, `test` (69 passing), `test:e2e` (12 passing),
+and `build` are all green as of the last full run. Remaining work is M10: a line-by-line audit
+against `MASTER_REQUIREMENTS.md` and a harsh self-review against the brief's own rubric.
 
 ---
 
@@ -416,3 +418,88 @@ control is not a security boundary; this test would have caught it if it were.
 - Same cold-Turbopack-compile-races-a-fixed-`waitForTimeout` issue as the M3–M6 audit (§8), now
   fixed once, centrally, in `e2e/helpers.ts`'s shared `login()` — poll `/dashboard` a few times
   with short waits rather than trust one fixed delay after clicking submit.
+  **Superseded by §11 below** — the polling-goto fix here was itself incomplete; the real root
+  cause was more specific than "cold compile."
+
+---
+
+## 11. M9 — Docs, SEO, deploy config, and the SUBMISSION package
+
+Built the entire product-facing and reviewer-facing surface that M0–M8 didn't touch: the
+marketing site, every doc the brief names, full SEO, CI, GitHub templates, and the submission
+package. Tagged **v1.0.0** at the end.
+
+### What was built
+
+- **Marketing site** (`src/app/(marketing)/`) — a real landing page (specific H1, a feature grid
+  grounded in what's actually built, one primary CTA, a real product screenshot — not a mockup),
+  a docs hub (`/docs`) linking to getting-started/features/deployment (each a crawlable static
+  page with breadcrumb markup), and an FAQ page with eight real questions. Its own layout
+  (header/footer), separate from the authenticated `(app)` shell — the two surfaces share almost
+  nothing, so sharing a layout would have meant conditionals in one file instead of two simple ones.
+- **Real screenshots** — captured with Playwright against the actual running app (dashboard,
+  tickets, ticket detail, analytics, command palette, settings/members, dark mode, mobile),
+  used by the landing page hero, the README, and `docs/screenshots/`. Not stock photos, not
+  mockups — satisfies the brief's "no lorem, no placeholder" literally.
+- **SEO** — `robots.ts` (allows the public site, blocks `/api` and the authenticated app),
+  `sitemap.ts` (the six public pages), a generated favicon/apple-icon/OG-image set (`next/og`'s
+  `ImageResponse`, matching the app's actual indigo accent rather than a static asset that could
+  drift from it), and JSON-LD (`SoftwareApplication` on the landing page, `FAQPage` on `/faq`
+  mirroring the visible Q&A verbatim, `BreadcrumbList` on each docs page matching its on-screen
+  trail) — all server-rendered into the initial HTML via a shared `<JsonLd>` component, never
+  client-injected.
+- **Documentation** — README rewrite (pitch, screenshots, quick start, demo credentials, env
+  table, roadmap — nothing left from the `create-next-app` default), `docs/architecture.md`
+  (ER diagram matching the *actual* current schema, not the earlier plan.md draft — `Tag`/
+  `SavedView` are noted as modeled-but-not-yet-exposed-in-the-UI rather than silently implied to
+  be finished features), `docs/API.md` (all 20 server actions + 3 route handlers, gathered by
+  grepping the codebase for `"use server"` files rather than working from memory), `docs/deployment.md`,
+  `docs/testing.md`, `docs/decisions.md` (a short, curated list — distinct from this file's full
+  chronological log), `docs/case-study.md`, `docs/demo-script.md` (a timed shot list, since a
+  video itself can't be generated), `CHANGELOG.md` (Keep a Changelog format), `CONTRIBUTING.md`.
+- **CI & GitHub hygiene** — `.github/workflows/ci.yml` (a fast `checks` job — typecheck, lint,
+  unit+integration tests, build — gating a separate `e2e` job so a flaky/slow E2E run doesn't
+  block the cheap, reliable checks), bug report + feature request issue templates, a PR template
+  matching CONTRIBUTING's own pre-push checklist.
+- **`SUBMISSION/README.md`** — the single entry point a reviewer needs: links (with honest
+  placeholders for the deploy URL and demo video, since those need the user's own action),
+  demo credentials for all three seeded roles, the one-paragraph pitch, feature list, tech
+  stack, architecture summary, folder structure, known limitations (stated plainly — no email
+  delivery, offset not keyset pagination, Tag/SavedView UI not built, single-instance rate
+  limiting), future improvements, and an honest "time spent" section naming the AI-paired
+  workflow directly rather than obscuring it (the brief explicitly asks for this).
+
+### A real, non-trivial bug found while building this milestone
+
+**Root cause, not just a symptom fix, for the login flakiness first patched in §8.** While
+capturing screenshots against a freshly rebuilt dev server, login started failing **consistently**
+(not intermittently) — 15 straight attempts, real server-side success every time (a 303 with a
+valid cookie, confirmed via a raw diagnostic script), zero cookies ever landing in the browser.
+The actual cause: the login helper called `page.goto("/dashboard")` **immediately** after
+clicking submit, in a retry loop. Starting a new navigation while one is still in flight
+**cancels the pending one** in the browser — which discarded the response carrying `Set-Cookie`
+before it was ever applied. This isn't a race that more retries fix; each retry *was* what broke
+it, over and over. The §8 entry's "poll with short waits" fix reduced how often this triggered
+without addressing why — it happened to avoid the interrupt often enough to look like a timing
+issue. Root-caused by comparing a script that succeeded (plain click-and-wait, no competing
+navigation) against the retry-loop version (which failed) and noticing the *only* structural
+difference was the interrupting `goto()`. Fixed properly in the committed `e2e/helpers.ts` by
+replacing the retry-loop with `waitForURL`, which observes the click's own navigation instead of
+racing it — the 12-test E2E suite got measurably faster as a side effect, not just more reliable.
+
+### Verified before tagging
+
+`typecheck`, `lint`, `test` (69/69), `test:e2e` (12/12), and `build` all green in one final,
+uninterrupted run — not stitched together from earlier partial runs. Database reseeded to
+canonical state afterward so the tag doesn't carry any test-created scratch data.
+
+### Known gaps going into M10
+
+- CI's `e2e` job has been carefully constructed (env vars cross-checked against `src/env.ts`,
+  migration commands matched to what's verified locally) but **not observed running on GitHub's
+  actual hosted runners** — pushing is still blocked on a local git-credential prompt. Worth
+  watching closely on the first real push; documented as a known limitation in `SUBMISSION/README.md`
+  rather than silently assumed to work.
+- `SUBMISSION/README.md`'s live deployment URL and demo video link are placeholders — both need
+  the user's own action (an actual `vercel deploy` and an actual screen recording) that this
+  session cannot perform on their behalf.
